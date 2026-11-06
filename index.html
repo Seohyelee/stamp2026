@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>2026 KIHASA 도서관 연말 행사</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f6f1e7; --paper:#fffdf8; --ink:#1f2a44; --muted:#6b7385;
+    --green:#1f5a45; --red:#c8372d; --gold:#d9a441; --line:#e6dccb;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  body{
+    font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--ink);
+    min-height:100vh;
+    padding:calc(env(safe-area-inset-top) + 16px) 16px calc(env(safe-area-inset-bottom) + 24px);
+    background-image:radial-gradient(circle at 10% 0%,#efe4cf 0,transparent 40%),radial-gradient(circle at 100% 100%,#e8efe9 0,transparent 45%);
+  }
+  .wrap{max-width:440px;margin:0 auto}
+  .view{display:none;animation:fade .3s ease}
+  .view.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+  header{text-align:center;padding:18px 8px 20px;position:relative}
+  .badge{display:inline-block;font-size:12px;letter-spacing:.14em;font-weight:700;color:var(--green);
+    border:1.5px solid var(--green);border-radius:999px;padding:4px 12px;margin-bottom:12px}
+  h1{font-size:26px;line-height:1.3;font-weight:900;letter-spacing:-.02em}
+  h1 span{color:var(--red)}
+  .sub{margin-top:8px;color:var(--muted);font-size:14px}
+  .snow{position:absolute;color:var(--gold);font-size:18px;opacity:.8}
+
+  .card{background:var(--paper);border-radius:22px;padding:20px;box-shadow:0 2px 0 var(--line),0 10px 30px rgba(31,42,68,.08);border:1px solid var(--line)}
+  .progress{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+  .bar{flex:1;height:10px;background:#efe8da;border-radius:99px;overflow:hidden}
+  .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--green),#3f8f6e);border-radius:99px;transition:width .5s ease}
+  .count{font-weight:700;font-size:15px;white-space:nowrap}
+
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .slot{position:relative;border:2px dashed #d8ccb6;border-radius:18px;padding:14px 12px 14px;min-height:178px;
+    display:flex;flex-direction:column;align-items:center;text-align:center;cursor:pointer;background:#fffaf0;transition:transform .15s}
+  .slot:active{transform:scale(.97)}
+  .num{font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.08em}
+  .circle{width:76px;height:76px;border-radius:50%;margin:10px 0 10px;display:flex;align-items:center;justify-content:center;
+    background:#f3ecdf;color:#bfb29b;font-size:30px;font-weight:900;position:relative}
+  .title{font-size:14px;font-weight:700;line-height:1.35;word-break:keep-all}
+  .hint{font-size:11.5px;color:var(--muted);margin-top:4px;line-height:1.35;word-break:keep-all}
+  .slot.done{border-style:solid;border-color:var(--red);background:#fff}
+  .slot.done .circle{background:transparent}
+  .stamp{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none}
+  .stamp svg{width:84px;height:84px;transform:rotate(-14deg)}
+  .slot.done .circle .q{display:none}
+  .slot.pop .stamp svg{animation:stamp .45s cubic-bezier(.2,1.6,.4,1)}
+  @keyframes stamp{0%{transform:scale(2.2) rotate(-30deg);opacity:0}100%{transform:scale(1) rotate(-14deg);opacity:1}}
+  .go{margin-top:auto;font-size:12px;font-weight:700;color:var(--green)}
+  .slot.done .go{color:var(--red)}
+
+  .complete{display:none;margin-top:16px;text-align:center;background:var(--green);color:#fff;border-radius:18px;padding:20px}
+  .complete.show{display:block;animation:fade .4s ease}
+  .complete b{display:block;font-size:20px;margin-bottom:6px}
+  .complete p{font-size:14px;opacity:.9;line-height:1.5}
+  .complete .time{margin-top:10px;font-size:12px;opacity:.75}
+
+  .notice{margin-top:16px;font-size:12.5px;color:var(--muted);line-height:1.6;padding:0 4px}
+  .reset{display:block;margin:14px auto 0;background:none;border:none;color:#a59a86;font-size:12px;text-decoration:underline;cursor:pointer}
+
+  /* quiz */
+  .back{background:none;border:none;font-size:15px;color:var(--ink);font-weight:500;padding:6px 0;cursor:pointer;font-family:inherit}
+  .qhead{margin:12px 0 16px}
+  .qtag{display:inline-block;background:var(--red);color:#fff;font-size:12px;font-weight:700;border-radius:8px;padding:4px 10px}
+  .qtext{font-size:20px;font-weight:700;line-height:1.45;margin-top:12px;word-break:keep-all}
+  .qtext em{font-style:normal;color:var(--red);text-decoration:underline;text-underline-offset:4px}
+  .opts{display:flex;flex-direction:column;gap:10px}
+  .opt{display:flex;align-items:center;gap:12px;width:100%;text-align:left;font-family:inherit;font-size:16px;font-weight:500;color:var(--ink);
+    background:#fffaf0;border:2px solid var(--line);border-radius:16px;padding:16px;cursor:pointer;transition:all .15s}
+  .opt .n{flex:none;width:30px;height:30px;border-radius:50%;background:#efe8da;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px}
+  .opt.sel{border-color:var(--green);background:#eef6f1}
+  .opt.sel .n{background:var(--green);color:#fff}
+  .opt.wrong{border-color:var(--red);background:#fdeeed;animation:shake .35s}
+  .opt.right{border-color:var(--green);background:#e3f2ea}
+  @keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+  .btn{display:block;width:100%;margin-top:18px;border:none;border-radius:16px;padding:16px;font-size:16px;font-weight:700;font-family:inherit;
+    background:var(--ink);color:#fff;cursor:pointer}
+  .btn:disabled{opacity:.35}
+  .btn.green{background:var(--green)}
+  .feedback{margin-top:14px;font-size:14.5px;font-weight:500;text-align:center;min-height:22px}
+  .feedback.bad{color:var(--red)}
+  .feedback.good{color:var(--green)}
+
+  /* gift */
+  .giftbtn{margin-top:14px;background:#fff;color:var(--green);font-size:17px}
+  .gtitle{text-align:center;padding:8px 0 4px}
+  .gtitle h2{font-size:24px;font-weight:900}
+  .gtitle p{color:var(--muted);font-size:14px;margin-top:6px}
+  .reel{margin:18px 0 6px;height:150px;border-radius:20px;background:var(--ink);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    position:relative;overflow:hidden;box-shadow:inset 0 0 0 4px var(--gold)}
+  .reel .ic{font-size:52px;line-height:1}
+  .reel .nm{font-size:20px;font-weight:700;margin-top:10px}
+  .reel.spin .ic,.reel.spin .nm{animation:blink .08s linear infinite alternate}
+  @keyframes blink{to{opacity:.55}}
+  .reel.win{background:var(--red);animation:winpop .5s cubic-bezier(.2,1.6,.4,1)}
+  @keyframes winpop{0%{transform:scale(.9)}100%{transform:scale(1)}}
+  .reel .lights{position:absolute;inset:8px;border-radius:14px;border:2px dotted rgba(217,164,65,.7);pointer-events:none}
+  .glist{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:16px}
+  .gi{background:#fffaf0;border:1.5px solid var(--line);border-radius:14px;padding:10px 4px;text-align:center;font-size:12px;font-weight:500;word-break:keep-all;line-height:1.3}
+  .gi span{display:block;font-size:24px;margin-bottom:4px}
+  .gi.hit{border-color:var(--red);background:#fdeeed;font-weight:700}
+  .gi.out{opacity:.35;text-decoration:line-through}
+  .gresult{text-align:center;margin-top:12px;font-size:15px;line-height:1.6;word-break:keep-all}
+  .gresult b{color:var(--red);font-size:18px}
+  .redraw{display:none;margin:12px auto 0;background:none;border:none;color:var(--muted);font-size:12.5px;text-decoration:underline;cursor:pointer;font-family:inherit}
+
+  /* modal */
+  .modal{position:fixed;inset:0;background:rgba(20,26,40,.5);display:none;align-items:flex-end;justify-content:center;z-index:10;padding:16px}
+  .modal.show{display:flex}
+  .sheet{background:var(--paper);width:100%;max-width:440px;border-radius:24px;padding:24px 20px calc(env(safe-area-inset-bottom) + 20px);animation:up .25s ease}
+  @keyframes up{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}
+  .sheet h3{font-size:18px;margin-bottom:6px}
+  .sheet p{font-size:14px;color:var(--muted);line-height:1.5}
+  .sheet input{width:100%;margin-top:14px;font-size:22px;letter-spacing:.4em;text-align:center;padding:14px;border-radius:14px;border:2px solid var(--line);font-family:inherit;background:#fff}
+  .sheet input:focus{outline:none;border-color:var(--green)}
+  .row{display:flex;gap:10px;margin-top:16px}
+  .row .btn{margin-top:0}
+  .btn.ghost{background:#efe8da;color:var(--ink)}
+  .err{color:var(--red);font-size:13px;margin-top:8px;min-height:18px;text-align:center}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- 스탬프 페이지 -->
+  <section class="view active" id="v-main">
+    <header>
+      <span class="snow" style="left:6%;top:14px">❄</span>
+      <span class="snow" style="right:8%;top:40px;font-size:14px">✦</span>
+      <div class="badge">STAMP TOUR</div>
+      <h1>2026 KIHASA<br>도서관 <span>연말 행사</span></h1>
+      <p class="sub">미션 4개를 모두 완료하고 스탬프를 모아 보세요!</p>
+    </header>
+
+    <div class="card">
+      <div class="progress">
+        <div class="bar"><i id="bar"></i></div>
+        <div class="count"><span id="cnt">0</span> / 4</div>
+      </div>
+      <div class="grid" id="grid"></div>
+
+      <div class="complete" id="complete">
+        <b>🎉 스탬프 투어 완료!</b>
+        <p>모든 미션을 완료했어요.<br>이 화면을 대출 데스크에 보여주세요.</p>
+        <div class="time" id="doneTime"></div>
+        <button class="btn giftbtn" id="toGift">🎁 선물 뽑으러 가기</button>
+      </div>
+    </div>
+
+    <p class="notice">
+      · 1~3번 미션은 도서관 대출 담당자가 확인 코드를 입력해 드립니다.<br>
+      · 스탬프 기록은 이 휴대폰의 브라우저에 저장됩니다. 같은 기기·브라우저로 접속해 주세요.
+    </p>
+    <button class="reset" id="resetBtn">기록 초기화</button>
+  </section>
+
+  <!-- 퀴즈 페이지 -->
+  <section class="view" id="v-quiz">
+    <button class="back" id="backBtn">← 스탬프판으로</button>
+    <div class="card" style="margin-top:8px">
+      <div class="qhead">
+        <span class="qtag">MISSION 4 · 퀴즈</span>
+        <p class="qtext">다음 중 연구원에서 구독 중인 학술 DB가 <em>아닌</em> 것은?</p>
+      </div>
+      <div class="opts" id="opts"></div>
+      <div class="feedback" id="fb"></div>
+      <button class="btn" id="submitBtn" disabled>정답 제출</button>
+    </div>
+  </section>
+</div>
+
+<!-- 선물 뽑기 페이지 -->
+<div class="wrap">
+  <section class="view" id="v-gift">
+    <button class="back" id="giftBack">← 스탬프판으로</button>
+    <div class="card" style="margin-top:8px">
+      <div class="gtitle">
+        <h2>🎁 선물 뽑기</h2>
+        <p>스탬프 투어 완료를 축하합니다!<br>버튼을 눌러 선물을 뽑아 보세요.</p>
+      </div>
+      <div class="reel" id="reel"><div class="lights"></div><div class="ic" id="rIc">🎁</div><div class="nm" id="rNm">무엇이 나올까요?</div></div>
+      <div class="gresult" id="gResult"></div>
+      <button class="btn green" id="drawBtn">선물 뽑기</button>
+      <button class="redraw" id="redrawBtn">재고 소진 시 다시 뽑기 (담당자용)</button>
+      <div class="glist" id="glist"></div>
+    </div>
+  </section>
+</div>
+
+<!-- 확인 모달 -->
+<div class="modal" id="modal">
+  <div class="sheet">
+    <h3 id="mTitle"></h3>
+    <p id="mDesc"></p>
+    <input id="mInput" type="password" inputmode="numeric" maxlength="8" placeholder="••••••" autocomplete="off">
+    <div class="err" id="mErr"></div>
+    <div class="row">
+      <button class="btn ghost" id="mCancel">취소</button>
+      <button class="btn green" id="mOk">확인</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ===== 설정 =====
+  const STAFF_CODE = '202612';          // 대출 담당자 확인 코드 (원하는 숫자로 변경)
+  const STORE_KEY  = 'kihasa-lib-stamp-2026';
+  const MISSIONS = [
+    { id:1, title:'도서관 방문하기', hint:'대출 담당자에게 확인 받으세요', type:'staff' },
+    { id:2, title:'인쇄책 1권 이상 대출하기', hint:'대출 담당자에게 확인 받으세요', type:'staff' },
+    { id:3, title:'전자책 1권 이상 이용하기', hint:'대출 담당자에게 확인 받으세요', type:'staff' },
+    { id:4, title:'2026년 구독 학술DB 맞추기 퀴즈', hint:'퀴즈 풀러 가기', type:'quiz' },
+  ];
+  const GIFTS = [
+    { id:1, name:'마그네틱시계', ic:'⏰' },
+    { id:2, name:'티코스터', ic:'🍵' },
+    { id:3, name:'핸드타올', ic:'🤲' },
+    { id:4, name:'달팽이커터칼', ic:'🐌' },
+    { id:5, name:'실리콘컵뚜껑', ic:'🥤' },
+    { id:6, name:'비누', ic:'🧼' },
+  ];
+  const QUIZ = { options:['DBPIA','KISS','ScienceDirect','Oxford University Press'], answer:3 };
+
+  // ===== 저장 =====
+  let state = {};
+  try { state = JSON.parse(localStorage.getItem(STORE_KEY)) || {}; } catch(e){ state = {}; }
+  const save = () => { try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch(e){} };
+
+  const $ = id => document.getElementById(id);
+  const stampSVG = n => `
+    <svg viewBox="0 0 100 100" aria-hidden="true">
+      <defs><filter id="rough${n}"><feTurbulence baseFrequency="0.9" numOctaves="2" result="t"/><feDisplacementMap in="SourceGraphic" in2="t" scale="1.2"/></filter></defs>
+      <g filter="url(#rough${n})" fill="none" stroke="#c4161c">
+        <circle cx="50" cy="50" r="44" stroke-width="5"/>
+        <circle cx="50" cy="50" r="36.5" stroke-width="2"/>
+      </g>
+      <g fill="#c4161c" stroke="#c4161c" stroke-width="0.8" stroke-linejoin="round" font-family="Noto Sans KR, sans-serif" text-anchor="middle">
+        <text x="50" y="32" font-size="8.5" font-weight="700" letter-spacing="1">KIHASA</text>
+        <text x="50" y="62" font-size="25" font-weight="900" stroke-width="1.4">완료!</text>
+        <text x="50" y="77" font-size="8" font-weight="700" letter-spacing=".5">2026 LIBRARY</text>
+      </g>
+    </svg>`;
+
+  // ===== 스탬프판 =====
+  function render(popId){
+    const grid = $('grid'); grid.innerHTML = '';
+    MISSIONS.forEach(m => {
+      const done = !!state[m.id];
+      const el = document.createElement('div');
+      el.className = 'slot' + (done ? ' done' : '') + (popId === m.id ? ' pop' : '');
+      el.innerHTML = `
+        <div class="num">MISSION ${m.id}</div>
+        <div class="circle"><span class="q">${m.id}</span>${done ? `<div class="stamp">${stampSVG(m.id)}</div>` : ''}</div>
+        <div class="title">${m.title}</div>
+        ${m.hint && !done ? `<div class="hint">${m.hint}</div>` : ''}
+        <div class="go">${done ? '완료 ✓' : (m.type==='quiz' ? '퀴즈 풀기 →' : '스탬프 받기 →')}</div>`;
+      el.onclick = () => onSlot(m);
+      grid.appendChild(el);
+    });
+    const n = MISSIONS.filter(m => state[m.id]).length;
+    $('cnt').textContent = n;
+    $('bar').style.width = (n/4*100) + '%';
+    const c = $('complete');
+    if (n === 4){
+      if (!state.completedAt){ state.completedAt = new Date().toISOString(); save(); }
+      const d = new Date(state.completedAt);
+      $('doneTime').textContent = '완료 시각 ' + d.toLocaleString('ko-KR');
+      $('toGift').textContent = state.gift ? '🎁 내 선물 확인하기' : '🎁 선물 뽑으러 가기';
+      c.classList.add('show');
+    } else c.classList.remove('show');
+  }
+
+  function stamp(id){
+    state[id] = new Date().toISOString(); save();
+    render(id);
+    try { navigator.vibrate && navigator.vibrate(60); } catch(e){}
+  }
+
+  function onSlot(m){
+    if (state[m.id]) return;
+    if (m.type === 'quiz') return openQuiz();
+    if (m.type === 'staff'){
+      openModal(`MISSION ${m.id} · ${m.title}`, '대출 담당자가 확인 코드를 입력해 주세요.', true, val => {
+        if (val === STAFF_CODE){ stamp(m.id); return true; }
+        $('mErr').textContent = '코드가 올바르지 않습니다.'; return false;
+      });
+    } else {
+      openModal(`MISSION ${m.id} · ${m.title}`, '미션을 완료하셨나요? 확인을 누르면 스탬프가 찍힙니다.', false, () => { stamp(m.id); return true; });
+    }
+  }
+
+  // ===== 모달 =====
+  let modalCb = null;
+  function openModal(title, desc, needCode, cb){
+    $('mTitle').textContent = title; $('mDesc').textContent = desc;
+    $('mInput').style.display = needCode ? 'block' : 'none';
+    $('mInput').value = ''; $('mErr').textContent = '';
+    modalCb = cb; $('modal').classList.add('show');
+    if (needCode) setTimeout(() => $('mInput').focus(), 200);
+  }
+  const closeModal = () => { $('modal').classList.remove('show'); modalCb = null; };
+  $('mCancel').onclick = closeModal;
+  $('mOk').onclick = () => { if (modalCb && modalCb($('mInput').value.trim())) closeModal(); };
+  $('mInput').onkeydown = e => { if (e.key === 'Enter') $('mOk').click(); };
+  $('modal').onclick = e => { if (e.target.id === 'modal') closeModal(); };
+
+  // ===== 퀴즈 =====
+  let sel = null;
+  function openQuiz(){
+    sel = null; $('fb').textContent = ''; $('fb').className = 'feedback';
+    $('submitBtn').disabled = true; $('submitBtn').textContent = '정답 제출'; $('submitBtn').className = 'btn';
+    const box = $('opts'); box.innerHTML = '';
+    QUIZ.options.forEach((t, i) => {
+      const b = document.createElement('button');
+      b.className = 'opt'; b.innerHTML = `<span class="n">${i+1}</span>${t}`;
+      b.onclick = () => {
+        if ($('submitBtn').dataset.done) return;
+        sel = i;
+        [...box.children].forEach((c, j) => c.className = 'opt' + (j === i ? ' sel' : ''));
+        $('fb').textContent = ''; $('submitBtn').disabled = false;
+      };
+      box.appendChild(b);
+    });
+    delete $('submitBtn').dataset.done;
+    show('v-quiz'); history.replaceState(null, '', '#quiz');
+  }
+
+  $('submitBtn').onclick = () => {
+    const btn = $('submitBtn');
+    if (btn.dataset.done){ backToMain(4); return; }
+    if (sel === null) return;
+    const opts = $('opts').children;
+    if (sel === QUIZ.answer){
+      opts[sel].className = 'opt right';
+      $('fb').className = 'feedback good';
+      $('fb').textContent = '정답입니다! Oxford University Press는 구독 DB가 아니에요.';
+      state[4] = new Date().toISOString(); save();
+      btn.dataset.done = '1'; btn.textContent = '스탬프 받으러 가기'; btn.className = 'btn green';
+    } else {
+      opts[sel].className = 'opt wrong';
+      $('fb').className = 'feedback bad';
+      $('fb').textContent = '아쉬워요! 다시 한 번 골라 보세요.';
+      btn.disabled = true; sel = null;
+    }
+  };
+
+  function show(id){
+    document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.id === id));
+    window.scrollTo(0, 0);
+  }
+  function backToMain(popId){ show('v-main'); history.replaceState(null, '', location.pathname); render(popId); }
+  $('backBtn').onclick = () => backToMain();
+
+  // ===== 초기화 =====
+  $('resetBtn').onclick = () => openModal('기록 초기화 (담당자용)', '스탬프와 선물 기록을 모두 지웁니다. 담당자 코드를 입력해 주세요.', true, val => {
+    if (val !== STAFF_CODE){ $('mErr').textContent = '코드가 올바르지 않습니다.'; return false; }
+    state = {}; save(); render(); return true;
+  });
+
+  // ===== 선물 뽑기 =====
+  const rand = n => { try { const a = new Uint32Array(1); crypto.getRandomValues(a); return a[0] % n; } catch(e){ return Math.floor(Math.random()*n); } };
+  let spinning = false;
+  function renderGift(){
+    const g = GIFTS.find(x => x.id === state.gift);
+    const out = state.giftOut || [];
+    $('glist').innerHTML = GIFTS.map(x => `<div class="gi${g && g.id===x.id ? ' hit' : ''}${out.includes(x.id) ? ' out' : ''}"><span>${x.ic}</span>${x.name}</div>`).join('');
+    const reel = $('reel');
+    if (g){
+      reel.className = 'reel win'; $('rIc').textContent = g.ic; $('rNm').textContent = g.name;
+      $('gResult').innerHTML = `축하합니다! <b>${g.name}</b> 당첨!<br>이 화면을 대출 데스크에 보여주고 선물을 받아 가세요.`;
+      $('drawBtn').style.display = 'none'; $('redrawBtn').style.display = 'block';
+    } else {
+      reel.className = 'reel'; $('rIc').textContent = '🎁'; $('rNm').textContent = '무엇이 나올까요?';
+      $('gResult').innerHTML = ''; $('drawBtn').style.display = 'block'; $('redrawBtn').style.display = 'none';
+    }
+  }
+  function openGift(){ if (MISSIONS.some(m => !state[m.id])) return; show('v-gift'); renderGift(); }
+  function draw(){
+    if (spinning) return;
+    const out = state.giftOut || [];
+    const pool = GIFTS.filter(x => !out.includes(x.id));
+    if (!pool.length) return;
+    const pick = pool[rand(pool.length)];
+    spinning = true; $('drawBtn').disabled = true; $('redrawBtn').style.display = 'none'; $('gResult').innerHTML = '';
+    const reel = $('reel'); reel.className = 'reel spin';
+    let i = rand(GIFTS.length), delay = 60, t0 = Date.now();
+    (function tick(){
+      i = (i + 1) % GIFTS.length;
+      $('rIc').textContent = GIFTS[i].ic; $('rNm').textContent = GIFTS[i].name;
+      if (Date.now() - t0 > 2200 && GIFTS[i].id === pick.id){
+        state.gift = pick.id; state.giftAt = new Date().toISOString(); save();
+        spinning = false; $('drawBtn').disabled = false; renderGift();
+        try { navigator.vibrate && navigator.vibrate([80,40,120]); } catch(e){}
+        return;
+      }
+      if (Date.now() - t0 > 1400) delay = Math.min(delay * 1.18, 320);
+      setTimeout(tick, delay);
+    })();
+  }
+  $('toGift').onclick = openGift;
+  $('giftBack').onclick = () => backToMain();
+  $('drawBtn').onclick = draw;
+  $('redrawBtn').onclick = () => {
+    const g = GIFTS.find(x => x.id === state.gift); if (!g) return;
+    openModal('다시 뽑기 (담당자용)', `'${g.name}' 재고가 소진된 경우에만 사용하세요. 해당 선물을 빼고 다시 뽑습니다.`, true, val => {
+      if (val !== STAFF_CODE){ $('mErr').textContent = '코드가 올바르지 않습니다.'; return false; }
+      state.giftOut = [...new Set([...(state.giftOut || []), g.id])];
+      delete state.gift; delete state.giftAt; save(); renderGift();
+      setTimeout(draw, 300); return true;
+    });
+  };
+
+  window.addEventListener('hashchange', () => { location.hash === '#quiz' && !state[4] ? openQuiz() : backToMain(); });
+  render();
+  if (location.hash === '#quiz' && !state[4]) openQuiz();
+</script>
+</body>
+</html>
